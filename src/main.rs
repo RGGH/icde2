@@ -1,12 +1,16 @@
-use iced::widget::{container, text, Column};
-use iced::{alignment, Element, Length, Sandbox, Settings};
+use iced::widget::{button, column, container, row, scrollable, text, text_input, Column};
+use iced::{alignment, Element, Length, Padding, Sandbox, Settings};
 
 struct GroceryList {
     grocery_items: Vec<String>,
+    input_value: String,
 }
 
 #[derive(Debug, Clone)]
-enum Message {}
+enum Message {
+    InputValue(String),
+    Submitted,
+}
 
 impl Sandbox for GroceryList {
     type Message = Message;
@@ -15,6 +19,7 @@ impl Sandbox for GroceryList {
     fn new() -> GroceryList {
         Self {
             grocery_items: vec!["Eggs".to_owned(), "Milk".to_owned(), "Flour".to_owned()],
+            input_value: String::default(),
         }
     }
 
@@ -32,12 +37,20 @@ impl Sandbox for GroceryList {
     }
 
     fn view(&self) -> Element<Self::Message> {
-        container(items_list_view(&self.grocery_items))
-            .height(Length::Fill)
-            .width(Length::Fill)
-            .align_x(alignment::Horizontal::Center)
-            .align_y(alignment::Vertical::Center)
-            .into()
+        container(
+            column!(
+                items_list_view(&self.grocery_items),
+                row!(text_input("Input grocery item", ""), button("Submit"))
+                    .spacing(30)
+                    .padding(Padding::from(30))
+            )
+            .align_items(iced::Alignment::Center),
+        )
+        .height(Length::Fill)
+        .width(Length::Fill)
+        .align_x(alignment::Horizontal::Center)
+        .align_y(alignment::Vertical::Center)
+        .into() 
     }
 }
 
