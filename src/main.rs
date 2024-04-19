@@ -30,19 +30,33 @@ impl Sandbox for GroceryList {
         iced::Theme::Dracula
     }
 
-    fn update(&mut self, _message: Self::Message) {
-        /*
-        Update the state of your app
-        */
-    }
+    fn update(&mut self,  message: Self::Message) {
+        match message {
+
+            Message::InputValue(value)=>self.input_value = value,
+            
+            Message::Submitted=>{
+            
+            self.grocery_items.push(self.input_value.clone());
+            
+            self.input_value =String::default();// Clear the input value
+            
+            }
+            
+            }}
 
     fn view(&self) -> Element<Self::Message> {
         container(
             column!(
                 items_list_view(&self.grocery_items),
-                row!(text_input("Input grocery item", ""), button("Submit"))
-                    .spacing(30)
-                    .padding(Padding::from(30))
+                row!(
+                    text_input("Input grocery item", &self.input_value)
+                        .on_input(|value| Message::InputValue(value))
+                        .on_submit(Message::Submitted),
+                    button("Submit").on_press(Message::Submitted)
+                )
+                .spacing(30)
+                .padding(Padding::from(30))
             )
             .align_items(iced::Alignment::Center),
         )
@@ -50,7 +64,7 @@ impl Sandbox for GroceryList {
         .width(Length::Fill)
         .align_x(alignment::Horizontal::Center)
         .align_y(alignment::Vertical::Center)
-        .into() 
+        .into()
     }
 }
 
