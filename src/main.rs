@@ -10,6 +10,7 @@ struct GroceryList {
 enum Message {
     InputValue(String),
     Submitted,
+    DeleteItem(usize),
 }
 
 impl Sandbox for GroceryList {
@@ -30,20 +31,20 @@ impl Sandbox for GroceryList {
         iced::Theme::Dracula
     }
 
-    fn update(&mut self,  message: Self::Message) {
+    fn update(&mut self, message: Self::Message) {
         match message {
+            Message::InputValue(value) => self.input_value = value,
 
-            Message::InputValue(value)=>self.input_value = value,
-            
-            Message::Submitted=>{
-            
-            self.grocery_items.push(self.input_value.clone());
-            
-            self.input_value =String::default();// Clear the input value
-            
+            Message::Submitted => {
+                self.grocery_items.push(self.input_value.clone());
+
+                self.input_value = String::default(); // Clear the input value
             }
-            
-            }}
+            Message::DeleteItem(item) => {
+                self.grocery_items.remove(item);
+            }
+        }
+    }
 
     fn view(&self) -> Element<Self::Message> {
         container(
@@ -76,7 +77,10 @@ fn items_list_view(items: &Vec<String>) -> Element<'static, Message> {
     for value in items {
         column = column.push(text(value));
     }
-    container(column).height(250.0).width(300).into()
+    scrollable(container(column))
+        .height(250.0)
+        .width(300)
+        .into()
 }
 
 fn main() -> iced::Result {
