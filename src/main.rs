@@ -35,11 +35,13 @@ impl Sandbox for GroceryList {
         match message {
             Message::InputValue(value) => self.input_value = value,
 
-            Message::Submitted => {
-                self.grocery_items.push(self.input_value.clone());
 
-                self.input_value = String::default(); // Clear the input value
-            }
+            Message::Submitted => {
+			let input_value = self.input_value.clone();
+			self.input_value = String::default(); // Clear the input value
+			self.grocery_items.push(input_value);
+		}
+
             Message::DeleteItem(item) => {
                 self.grocery_items.remove(item);
             }
@@ -74,13 +76,26 @@ fn items_list_view(items: &Vec<String>) -> Element<'static, Message> {
         .spacing(20)
         .align_items(iced::Alignment::Center)
         .width(Length::Fill);
-    for value in items {
-        column = column.push(text(value));
+
+    for (index, value) in items.into_iter().enumerate() {
+        column = column.push(grocery_item(index, value));
     }
+
     scrollable(container(column))
         .height(250.0)
         .width(300)
         .into()
+}
+
+fn grocery_item(index: usize, value: &str) -> Element<'static, Message> {
+    row!(
+        text(value),
+        button("Delete")
+        .on_press(Message::DeleteItem(index))
+    )
+    .align_items(iced::Alignment::Center)
+    .spacing(30)
+    .into()
 }
 
 fn main() -> iced::Result {
